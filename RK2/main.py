@@ -1,5 +1,7 @@
 from operator import itemgetter
+
 class Program:
+    """Программа"""
     def __init__(self, id, name, comp_id, size_in_gb):
         self.id = id
         self.name = name
@@ -7,28 +9,46 @@ class Program:
         self.size_in_gb = size_in_gb
 
 class Computer:
+    """Компьютер"""
     def __init__(self, id, model, RAM, owner):
         self.id = id
         self.model = model
         self.RAM = RAM
         self.owner = owner
 
-class ProgramComputerLink:
+class ProgramComputer:
+    """Связь Программы и Компьютера"""
     def __init__(self, pr_id, comp_id):
         self.pr_id = pr_id
         self.comp_id = comp_id
 
-def generate_one_to_many(programs, computers):
-    return [(p.name, p.size_in_gb, c.owner, c.model) for p in programs for c in computers if p.comp_id == c.id]
+def a1_solution(one_to_many):
+    return sorted(one_to_many, key=itemgetter(2))
 
-def generate_many_to_many(programs, program_computer_links, computers):
-    many_to_many_temp = [(p.name, p_c.pr_id, p_c.comp_id) for p_c in program_computer_links for p in programs if p.id == p_c.pr_id]
-    return [(pr_name, c.model, c.owner) for pr_name, _, p_c_id in many_to_many_temp for c in computers if c.id == p_c_id]
+def a2_solution(one_to_many):
+    res_a2_unsorted = []
+    for c in set(item[2] for item in one_to_many):
+        c_emps = list(filter(lambda i: i[2] == c, one_to_many))
+        if c_emps:
+            c_cores = sum(core for _, core, _, _ in c_emps)
+            res_a2_unsorted.append((c, c_cores))
+    res_a2 = sorted(res_a2_unsorted, key=itemgetter(1), reverse=True)
+    return res_a2
 
-def filter_programs_by_name(programs, name_substring):
-    return [p for p in programs if name_substring in p.name]
+
+def a3_solution(many_to_many):
+    res_a3 = {}
+    for p in set(item[0] for item in many_to_many):
+        if 'Excel' in p:  # Fix the typo here
+            p_computers = list(filter(lambda i: i[0] == p, many_to_many))
+            p_computer_info = [owner for _, _, owner in p_computers]
+            res_a3[p] = p_computer_info
+    return res_a3
+
+
 
 def main():
+    """Основная функция"""
     programs = [
         Program(1, 'Microsoft Word', 1, 2.0),
         Program(2, 'Microsoft Excel', 1, 1.5),
@@ -45,13 +65,12 @@ def main():
         Computer(5, 'PerformanceElite 3000', '128 GB DDR4', 'Михайлов Алексей Дмитриевич')
     ]
 
-    pr_comp = [ProgramComputerLink(1, 1), ProgramComputerLink(1, 2), ProgramComputerLink(1, 4),
-               ProgramComputerLink(2, 3), ProgramComputerLink(2, 1),
-               ProgramComputerLink(3, 4), ProgramComputerLink(4, 5),
-               ProgramComputerLink(3, 5)]
-
-    one_to_many_sorted = sorted(generate_one_to_many(programs, computers), key=itemgetter(0))
-    many_to_many = generate_many_to_many(programs, pr_comp, computers)
+    pr_comp = [
+        ProgramComputer(1, 1), ProgramComputer(1, 2), ProgramComputer(1, 4),
+        ProgramComputer(2, 3), ProgramComputer(2, 1),
+        ProgramComputer(3, 4), ProgramComputer(4, 5),
+        ProgramComputer(3, 5)
+    ]
 
     one_to_many = [(p.name, p.size_in_gb, c.owner, c.model)
                    for p in programs
@@ -63,8 +82,18 @@ def main():
                          for p in programs
                          if p.id == p_c.pr_id]
 
-    return one_to_many_sorted, many_to_many, many_to_many_temp
+    many_to_many = [(pr_name, c.model, c.owner)
+                    for pr_name, dep_id, p_c_id in many_to_many_temp
+                    for c in computers if c.id == p_c_id]
 
+    print('Задание А1')
+    print(a1_solution(one_to_many))
+
+    print('\nЗадание А2')
+    print(a2_solution(one_to_many))
+
+    print('\nЗадание А3')
+    print(a3_solution(many_to_many))
 
 if __name__ == '__main__':
     main()
