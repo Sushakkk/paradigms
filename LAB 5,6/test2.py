@@ -1,6 +1,6 @@
 from main import LevenshteinDistance
 # Тесты с использованием pytest (BDD)
-
+# BDD - фреймворк (не менее 3 тестов).
 import pytest
 
 @pytest.fixture

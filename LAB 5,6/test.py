@@ -1,6 +1,6 @@
 
 # TDD - фреймворк (не менее 3 тестов).
-# BDD - фреймворк (не менее 3 тестов).
+
 import unittest
 from main import LevenshteinDistance
 
